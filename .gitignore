@@ -50,3 +50,11 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+/build.xml
+/build/built-jar.properties
+/build/classes/firgen/firGen$1.class
+/build/classes/firgen/firGen$2.class
+/build/classes/firgen/firGen$3.class
+/build/classes/firgen/firGen$4.class
+/build/classes/firgen/firGen$5.class
+/build/classes/firgen/firGen.class
