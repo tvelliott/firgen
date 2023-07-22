@@ -35,6 +35,7 @@
 #include <unistd.h>
 
 void test_filter(double *coef, int len, int do_rounding);
+float sincf(float x);
 
 double calc_bessel(double x)
 {
@@ -72,6 +73,7 @@ double gain = 1.0f;
 float alpha = 0.5;
 double denom = 1.0;
 int do_rounding=0;
+double sinc_gain=0.0;
 
 double a0;
 double a1;
@@ -83,7 +85,7 @@ double a4;
 
 
   
-  while ((c = getopt(argc, argv, "w:d:l:b:c:g:a:")) != -1) {
+  while ((c = getopt(argc, argv, "w:d:l:b:c:g:a:s:")) != -1) {
     switch (c) {
       case 'w': 
         win_type = atoi( optarg ); 
@@ -100,6 +102,7 @@ double a4;
 
       case 'b': 
         bw_type = atof( optarg ); 
+        bw_type /= 2.0;
       break;
 
       case 'c': 
@@ -112,6 +115,10 @@ double a4;
 
       case 'a': 
         alpha = (double) atof( optarg ); 
+      break;
+
+      case 's': 
+        sinc_gain = (double) atof( optarg ); 
       break;
     }
   }
@@ -186,6 +193,7 @@ double a4;
         w[i] = calc_bessel(M_PI*alpha*sqrt(1-pow((2*(float)i/(h_len-1))-1,2))) / denom;
       break;
 
+      //Hann window / Raised Cosine
       case 3 :
          w[i] = 0.5 - 0.5*cos(2*M_PI*(float)i/(h_len-1));
       break;
@@ -282,16 +290,19 @@ double a4;
     }
 
 
+
     if(i>0 && i%16==0) printf("\r\n");
   }
+
 
   printf(" };\r\n//start_mag\r\n");
 
   // run filter analysis with discrete Fourier transform
+
   for (i=0; i < nfft; i++) {
     // accumulate energy in frequency (also apply frequency shift)
     float complex H = 0.0f;
-    float frequency = (float)i/(float)nfft-0.5f;
+    float frequency = (float)(i+nfft/2)/((float)nfft);
     for (k=0; k < h_len; k++)
     H += h[k]*cexpf(_Complex_I*2*M_PI*k*frequency);
 
@@ -304,6 +315,34 @@ double a4;
 
   output_verilog(argc, argv, s, w, h, h_len, 1.0);
 
+  printf("\r\n");
+  for (i=0; i < h_len; i++) {
+    float idx = (float) i - (float) h_len/2.0;
+    if(sinc_gain>0) {
+      h[i] *= sinc_gain * pow((idx),2.0); 
+      printf("%f, ", h[i]);
+    }
+  }
+
+
+
   return 0;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// compute sinc(x) = sin(pi*x) / (pi*x)
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+float sincf(float _x) {
+    // _x ~ 0 approximation
+    //if (fabsf(_x) < 0.01f)
+    //    return expf(-lngammaf(1+_x) - lngammaf(1-_x));
+
+    // _x ~ 0 approximation
+    // from : http://mathworld.wolfram.com/SincFunction.html
+    // sinc(z) = \prod_{k=1}^{\infty} { cos(\pi z / 2^k) }
+    if (fabsf(_x) < 0.01f)
+        return cosf(M_PI*_x/2.0f)*cosf(M_PI*_x/4.0f)*cosf(M_PI*_x/8.0f);
+
+    return sinf(M_PI*_x)/(M_PI*_x);
 }
 

@@ -26,6 +26,8 @@
 #include <string.h>
 #include <time.h>
 
+#include "p25_test_data.h";
+
 int8_t rand_data[512];
 
 
@@ -76,43 +78,35 @@ double val = 0.0;
   
   return val;
 }
+
 ///////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////
 void test_filter(double *coef, int len, int do_rounding) {
   struct timespec requestStart;
   clock_gettime(CLOCK_REALTIME, &requestStart);
-
   int i;
   srand(requestStart.tv_nsec);
   for(i=0;i<sizeof(rand_data);i++) {
     rand_data[i] = (int8_t) (rand()%256);
   }
 
+
+  double *p25_test_data = (double *) &p25_test_data_b[0];
+
   //test data no filter
   printf("\r\nstart_test_data\r\n");
-  for(i=0;i<sizeof(test_data);i++) {
-    printf("%d\r\n",test_data[i]);
-  }
-  for(i=0;i<sizeof(test_data);i++) {
-    printf("%d\r\n",test_data[i]);
-  }
-  for(i=0;i<sizeof(rand_data);i++) {
-    printf("%d\r\n",rand_data[i]);
+  for(i=0;i<sizeof(p25_test_data_b)/8;i++) {
+    printf("%f\r\n", (double) p25_test_data[i]);
   }
   printf("\r\nend_test_data\r\n");
 
+  p25_test_data = (double *) &p25_test_data_b[0];
+
+
   //test data with filter
   printf("\r\nstart_test_filter\r\n");
-  for(i=0;i<sizeof(test_data);i++) {
-    double d = eval_fir(coef,(double) test_data[i],len, do_rounding);
-    printf("%f\r\n", d); 
-  }
-  for(i=0;i<sizeof(test_data);i++) {
-    double d = eval_fir(coef,(double) test_data[i],len, do_rounding);
-    printf("%f\r\n", d); 
-  }
-  for(i=0;i<sizeof(rand_data);i++) {
-    double d = eval_fir(coef,(double) rand_data[i],len, do_rounding);
+  for(i=0;i<sizeof(p25_test_data_b)/8;i++) {
+    double d = eval_fir(coef,(double) p25_test_data[i],len, do_rounding);
     printf("%f\r\n", d); 
   }
   printf("\r\nend_test_filter\r\n");

@@ -76,6 +76,7 @@ JFreeChart mag_chart;
 NumberAxis mag_domainAxis;
 XYSeriesCollection mag_series_collection;
 XYSeries mag_data;
+XYSeries inv_sinc_data;
 
 //sim charts
 JFreeChart sim_chart1;
@@ -162,6 +163,11 @@ Preferences prefs;
         jSeparator7 = new javax.swing.JSeparator();
         jLabel6 = new javax.swing.JLabel();
         gain_tf = new javax.swing.JTextField();
+        jPanel5 = new javax.swing.JPanel();
+        jSeparator10 = new javax.swing.JSeparator();
+        sinc_correction = new javax.swing.JCheckBox();
+        jLabel7 = new javax.swing.JLabel();
+        sinc_gain = new javax.swing.JTextField();
         jPanel4 = new javax.swing.JPanel();
         genSim = new javax.swing.JButton();
         jSeparator8 = new javax.swing.JSeparator();
@@ -240,6 +246,29 @@ Preferences prefs;
         jPanel2.add(gain_tf);
 
         jPanel1.add(jPanel2);
+
+        jPanel5.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jSeparator10.setMinimumSize(new java.awt.Dimension(100, 0));
+        jSeparator10.setPreferredSize(new java.awt.Dimension(100, 0));
+        jPanel5.add(jSeparator10);
+
+        sinc_correction.setText("SINC correction");
+        sinc_correction.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sinc_correctionActionPerformed(evt);
+            }
+        });
+        jPanel5.add(sinc_correction);
+
+        jLabel7.setText("Gain");
+        jPanel5.add(jLabel7);
+
+        sinc_gain.setColumns(4);
+        sinc_gain.setText("1.0");
+        jPanel5.add(sinc_gain);
+
+        jPanel1.add(jPanel5);
 
         genSim.setText("genSim");
         genSim.addActionListener(new java.awt.event.ActionListener() {
@@ -342,6 +371,10 @@ Preferences prefs;
     private void genSimActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_genSimActionPerformed
       sim_frame.setVisible(true);
     }//GEN-LAST:event_genSimActionPerformed
+
+    private void sinc_correctionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sinc_correctionActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_sinc_correctionActionPerformed
 
     /**
      * @param args the command line arguments
@@ -471,6 +504,9 @@ Preferences prefs;
         cmd_line = cmd_line.concat( String.format("-w%d ", window_type.getSelectedIndex()) ); 
         cmd_line = cmd_line.concat( String.format("-g%s ", gain_tf.getText()) ); 
         cmd_line = cmd_line.concat( String.format("-a%s ", alpha.getText()) ); 
+        if( sinc_correction.isSelected() ) {
+          cmd_line = cmd_line.concat( String.format("-s%s ", sinc_gain.getText()) ); 
+        }
 
         System.out.println("executing "+cmd_line);
 
@@ -608,12 +644,15 @@ Preferences prefs;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator10;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
@@ -626,6 +665,8 @@ Preferences prefs;
     private javax.swing.JPanel mag_panel;
     private javax.swing.JPanel main_panel;
     private javax.swing.JComboBox outtype;
+    private javax.swing.JCheckBox sinc_correction;
+    private javax.swing.JTextField sinc_gain;
     private javax.swing.JButton update;
     private javax.swing.JComboBox window_type;
     // End of variables declaration//GEN-END:variables
